@@ -32,4 +32,7 @@ flutter:
      fonts:
        - asset: fonts/Roboto-Bold.ttf
        - asset: fonts/Roboto-Regular.ttf
+   - family: CustomIcons
+     fonts:
+         - asset: fonts/CustomIcons.ttf
 

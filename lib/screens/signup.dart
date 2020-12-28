@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kooma/config/colors.dart';
 import 'package:kooma/config/custom_icons.dart';
@@ -7,7 +8,12 @@ import '../widgets/buttons/primary_button.dart';
 import '../widgets/buttons/social_auth_button.dart';
 import '../widgets/form_field.dart';
 
+import 'package:kooma/models/auth/email.dart';
+
 class SignUp extends StatelessWidget {
+  String email;
+  String password;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,17 +50,44 @@ class SignUp extends StatelessWidget {
             CustomFormField(
               inputType: TextInputType.emailAddress,
               hint: "Your Email Here",
-              onChange: (value) {},
+              onChange: (value) {
+                email = value;
+              },
             ),
             SizedBox(height: 20.0),
             CustomFormField(
               inputType: TextInputType.text,
               obscure: true,
               hint: "Your Password Here",
-              onChange: (value) {},
+              onChange: (value) {
+                password = value;
+              },
             ),
             SizedBox(height: 35.0),
-            PrimaryButton(onPress: () {}, btnText: "Sign Up"),
+            PrimaryButton(
+              onPress: () async {
+                try {
+                  final newUser =
+                      RegisterWithEmail(email: email, password: password);
+
+                  final user = await newUser.register();
+
+                  if (user != null) {
+                    Navigator.pushNamed(context, "chat");
+                  }
+                } on FirebaseAuthException catch (e) {
+                  if (e.code == 'weak-password') {
+                    print("Error: weak password");
+                  }
+                  if (e.code == 'email-already-in-use') {
+                    print("Error: email already in use");
+                  }
+                } catch (e) {
+                  print(e);
+                }
+              },
+              btnText: "Sign Up",
+            ),
             SizedBox(height: 35.0),
             DividerInAuthScreen(),
             SizedBox(height: 35.0),

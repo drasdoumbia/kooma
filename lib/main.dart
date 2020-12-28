@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:kooma/config/colors.dart';
 import 'package:kooma/routes.dart';
@@ -5,7 +6,9 @@ import 'package:your_splash/your_splash.dart';
 
 import 'screens/onBoarding.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(Kooma());
 }
 

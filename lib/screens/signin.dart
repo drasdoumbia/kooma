@@ -2,13 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kooma/config/colors.dart';
 import 'package:kooma/config/custom_icons.dart';
+import 'package:provider/provider.dart';
 
 import '../widgets/divider_in_auth_screen.dart';
 import '../widgets/buttons/primary_button.dart';
 import '../widgets/buttons/social_auth_button.dart';
 import '../widgets/form_field.dart';
 
-import 'package:kooma/models/auth/email.dart';
+import 'package:kooma/models/auth/email_auth_model.dart';
 
 class SignIn extends StatelessWidget {
   String email;
@@ -67,12 +68,12 @@ class SignIn extends StatelessWidget {
             PrimaryButton(
               onPress: () async {
                 try {
-                  final newUser =
-                      RegisterWithEmail(email: email, password: password);
+                  var auth =
+                      Provider.of<EmailAuthModel>(context, listen: false);
 
-                  final user = await newUser.signIn();
+                  var loggedUser = auth.signIn(email, password);
 
-                  if (user != null) {
+                  if (loggedUser != null) {
                     Navigator.pushNamed(context, "chat");
                   }
                 } on FirebaseAuthException catch (e) {

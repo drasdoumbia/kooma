@@ -1,10 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:kooma/screens/signin.dart';
+import 'package:kooma/models/auth/email_auth_model.dart';
+import 'package:kooma/screens/chat.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:your_splash/your_splash.dart';
 
+import 'models/auth/email_auth_model.dart';
 import 'screens/onBoarding.dart';
+import 'screens/signin.dart';
 
 class App extends StatefulWidget {
   @override
@@ -12,7 +16,9 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  final _auth = FirebaseAuth.instance;
   bool isSeen;
+  User loggedInUser;
 
   void getFirstSeen() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -26,16 +32,14 @@ class _AppState extends State<App> {
     print("isSeen $isSeen");
   }
 
-  void initFirebase() async {
-    WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp();
-  }
-
   @override
   void initState() {
     super.initState();
 
-    initFirebase();
+    loggedInUser = _auth.currentUser;
+
+    print("app: $loggedInUser");
+
     getFirstSeen();
   }
 
@@ -43,8 +47,13 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return SplashScreen.timed(
       seconds: 4,
-      route:
-          MaterialPageRoute(builder: (_) => isSeen ? SignIn() : OnBoarding()),
+      route: MaterialPageRoute(
+        builder: (_) => (isSeen && loggedInUser != null)
+            ? Chat()
+            : (isSeen && loggedInUser == null)
+                ? SignIn()
+                : OnBoarding(),
+      ),
       body: Scaffold(
         body: Container(
           color: Color(0xFFFAD271),

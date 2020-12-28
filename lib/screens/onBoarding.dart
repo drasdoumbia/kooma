@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../config/colors.dart';
 import '../config/custom_icons.dart';
@@ -7,6 +8,11 @@ import '../widgets/buttons/primary_button.dart';
 class OnBoarding extends StatelessWidget {
   const OnBoarding();
 
+  void firstSeen() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isSeen', true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +20,7 @@ class OnBoarding extends StatelessWidget {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: Text("Kooma",
+        title: const Text("Kooma",
             style:
                 TextStyle(fontSize: 16.0, color: ConstantColors.grayDarkColor)),
       ),
@@ -41,7 +47,7 @@ class OnBoarding extends StatelessWidget {
             color: ConstantColors.secondaryColor,
             btnText: "Sign me up",
             onPress: () {
-              print("Do something");
+              firstSeen();
               Navigator.pushNamed(context, 'signup');
             },
           ),

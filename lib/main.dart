@@ -1,14 +1,10 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:kooma/config/colors.dart';
-import 'package:kooma/routes.dart';
-import 'package:your_splash/your_splash.dart';
 
-import 'screens/onBoarding.dart';
+import 'app.dart';
+import 'config/colors.dart';
+import 'routes.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
   runApp(Kooma());
 }
 
@@ -32,26 +28,7 @@ class Kooma extends StatelessWidget {
             bodyText1:
                 TextStyle(fontSize: 14.0, color: ConstantColors.grayDarkColor)),
       ),
-      home: SplashScreen.timed(
-        seconds: 4,
-        route: MaterialPageRoute(builder: (_) => OnBoarding()),
-        body: Scaffold(
-          body: Container(
-            color: Color(0xFFFAD271),
-            child: Center(
-              child: Container(
-                width: 200.0,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    alignment: Alignment.center,
-                    image: AssetImage("assets/imgs/splash_screen_content.png"),
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
+      home: App(),
     );
   }
 }

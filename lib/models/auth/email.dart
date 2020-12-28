@@ -22,7 +22,7 @@ class RegisterWithEmail implements UserRepository<UserCredential> {
 
   @override
   Future<UserCredential> signIn() async {
-    final currentUser = await _auth.createUserWithEmailAndPassword(
+    final currentUser = await _auth.signInWithEmailAndPassword(
         email: email, password: password);
 
     print(currentUser);

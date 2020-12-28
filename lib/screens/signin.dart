@@ -10,7 +10,7 @@ import '../widgets/form_field.dart';
 
 import 'package:kooma/models/auth/email.dart';
 
-class SignUp extends StatelessWidget {
+class SignIn extends StatelessWidget {
   String email;
   String password;
 
@@ -30,7 +30,7 @@ class SignUp extends StatelessWidget {
           ),
         ),
         title: Text(
-          "Sign Up",
+          "Log In",
           style: TextStyle(fontSize: 16.0, color: ConstantColors.grayDarkColor),
         ),
       ),
@@ -42,7 +42,7 @@ class SignUp extends StatelessWidget {
             SizedBox(height: 50.0),
             Center(
               child: Text(
-                "Sign today to join a \nbeautiful community",
+                "Log into your account \nto start the conversations",
                 style: Theme.of(context).textTheme.headline1,
               ),
             ),
@@ -70,7 +70,7 @@ class SignUp extends StatelessWidget {
                   final newUser =
                       RegisterWithEmail(email: email, password: password);
 
-                  final user = await newUser.register();
+                  final user = await newUser.signIn();
 
                   if (user != null) {
                     Navigator.pushNamed(context, "chat");
@@ -86,19 +86,19 @@ class SignUp extends StatelessWidget {
                   print(e);
                 }
               },
-              btnText: "Sign Up",
+              btnText: "Log In",
             ),
             SizedBox(height: 35.0),
             DividerInAuthScreen(),
             SizedBox(height: 35.0),
             SocialAuthButton(
               socialIcon: Image.asset("assets/imgs/google.png", width: 20.0),
-              btnText: "Sign Up with Google",
+              btnText: "Log In with Google",
             ),
             SizedBox(height: 20.0),
             SocialAuthButton(
               socialIcon: Image.asset("assets/imgs/facebook.png", width: 20.0),
-              btnText: "Sign Up with Facebook",
+              btnText: "Log In with Facebook",
             ),
             SizedBox(height: 60.0),
             Padding(
@@ -107,14 +107,14 @@ class SignUp extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      "Already have an account?",
+                      "Don’t have an account yet?",
                       style: TextStyle(
                         fontSize: 16.0,
                       ),
                     ),
                     SizedBox(width: 10.0),
                     Text(
-                      "Log in here",
+                      "Sign Up here",
                       style: TextStyle(
                         color: ConstantColors.grayColor,
                         fontSize: 16.0,
@@ -125,7 +125,7 @@ class SignUp extends StatelessWidget {
                   ],
                 ),
                 onTap: () {
-                  Navigator.pushNamed(context, "signin");
+                  Navigator.pushNamed(context, "signup");
                 },
               ),
             ),

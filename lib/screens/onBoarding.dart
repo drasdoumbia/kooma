@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../config/colors.dart';
 import '../config/custom_icons.dart';
-import '../widgets/primary_button.dart';
+import '../widgets/buttons/primary_button.dart';
 
 class OnBoarding extends StatelessWidget {
   const OnBoarding();
@@ -15,7 +15,8 @@ class OnBoarding extends StatelessWidget {
         elevation: 0,
         backgroundColor: Colors.white,
         title: Text("Kooma",
-            style: TextStyle(color: ConstantColors.grayDarkColor)),
+            style:
+                TextStyle(fontSize: 16.0, color: ConstantColors.grayDarkColor)),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -41,6 +42,7 @@ class OnBoarding extends StatelessWidget {
             btnText: "Sign me up",
             onPress: () {
               print("Do something");
+              Navigator.pushNamed(context, 'signup');
             },
           ),
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kooma/config/colors.dart';
+import 'package:kooma/routes.dart';
 import 'package:your_splash/your_splash.dart';
 
 import 'screens/onBoarding.dart';
@@ -13,6 +14,8 @@ class Kooma extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Kooma',
+      initialRoute: '/',
+      onGenerateRoute: Routes.generateRoute,
       theme: ThemeData(
         fontFamily: "Roboto",
         primaryColor: ConstantColors.primaryColor,

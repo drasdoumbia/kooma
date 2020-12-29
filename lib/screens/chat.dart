@@ -27,7 +27,8 @@ class Chat extends StatelessWidget {
               child: Avatar(borderColor: ConstantColors.primaryColor),
             ),
             onTap: () {
-              Provider.of<EmailAuthModel>(context, listen: false).signOut();
+              Navigator.pushNamed(context, "profile");
+              // Provider.of<EmailAuthModel>(context, listen: false).signOut();
             },
           ),
         ],

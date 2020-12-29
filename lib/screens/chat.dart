@@ -78,39 +78,7 @@ class ChatList extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Avatar(borderColor: ConstantColors.grayColor),
-                SizedBox(height: 5.0),
-                Container(
-                  constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * 0.55),
-                  child: Material(
-                    color: ConstantColors.grayColor,
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(20.0),
-                      bottomLeft: Radius.circular(20.0),
-                      bottomRight: Radius.circular(20.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 13.0, horizontal: 13.0),
-                      child: Text(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In consectetur malesuada.",
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyText1
-                            .copyWith(color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          MessageItem(),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Column(
@@ -158,7 +126,50 @@ class ChatList extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(width: double.infinity, height: 30.0),
+          SizedBox(width: double.infinity),
+        ],
+      ),
+    );
+  }
+}
+
+class MessageItem extends StatelessWidget {
+  const MessageItem({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Avatar(borderColor: ConstantColors.grayColor),
+          SizedBox(height: 5.0),
+          Container(
+            constraints: BoxConstraints(
+                maxWidth: MediaQuery.of(context).size.width * 0.55),
+            child: Material(
+              color: ConstantColors.grayColor,
+              borderRadius: BorderRadius.only(
+                topRight: Radius.circular(20.0),
+                bottomLeft: Radius.circular(20.0),
+                bottomRight: Radius.circular(20.0),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 13.0, horizontal: 13.0),
+                child: Text(
+                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In consectetur malesuada.",
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyText1
+                      .copyWith(color: Colors.white),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

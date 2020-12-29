@@ -10,6 +10,7 @@ import '../widgets/buttons/primary_button.dart';
 import '../widgets/buttons/social_auth_button.dart';
 import '../widgets/form_field.dart';
 
+//ignore: must_be_immutable
 class SignUp extends StatelessWidget {
   String email;
   String password;

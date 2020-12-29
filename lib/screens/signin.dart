@@ -11,6 +11,7 @@ import '../widgets/form_field.dart';
 
 import 'package:kooma/models/auth/email_auth_model.dart';
 
+//ignore: must_be_immutable
 class SignIn extends StatelessWidget {
   String email;
   String password;

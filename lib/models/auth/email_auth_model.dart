@@ -43,15 +43,13 @@ class EmailAuthModel extends ChangeNotifier
     return loggedUser;
   }
 
-  @override
-  Future<User> getCurrentUser() {
+/*  @override
+  User getCurrentUser() {
     loggedInUser = _auth.currentUser;
     print("model: $loggedInUser");
 
     notifyListeners();
-
-    return loggedInUser;
-  }
+  }*/
 
   @override
   Future<void> signOut() async {

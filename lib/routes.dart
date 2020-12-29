@@ -16,6 +16,8 @@ class Routes {
         return MaterialPageRoute(builder: (context) => SignIn());
       case 'chat':
         return MaterialPageRoute(builder: (context) => Chat());
+      default:
+        return MaterialPageRoute(builder: (context) => Home());
     }
   }
 }

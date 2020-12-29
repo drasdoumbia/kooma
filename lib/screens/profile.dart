@@ -118,7 +118,13 @@ class Profile extends StatelessWidget {
             ),
           ),
           SizedBox(height: 60.0),
-          RoundedIconButton(onPress: () {}, btnText: "Edit Profile"),
+          RoundedIconButton(
+            icon: CustomIcons.edit,
+            btnText: "Edit Profile",
+            onPress: () {
+              Navigator.pushNamed(context, "editProfile");
+            },
+          ),
         ],
       ),
     );

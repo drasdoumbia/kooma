@@ -6,18 +6,20 @@ class RoundedIconButton extends StatelessWidget {
   final Function onPress;
   final String btnText;
   final Color color;
+  final IconData icon;
 
   const RoundedIconButton(
       {@required this.onPress,
       @required this.btnText,
-      this.color = ConstantColors.primaryColor});
+      this.color = ConstantColors.primaryColor,
+      this.icon});
 
   @override
   Widget build(BuildContext context) {
     return FlatButton(
       minWidth: 318.0,
       height: 48.0,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(24.0)),
       ),
       color: color,
@@ -27,7 +29,7 @@ class RoundedIconButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(CustomIcons.edit, color: Colors.white, size: 17.0),
+            Icon(icon, color: Colors.white, size: 18.0),
             SizedBox(width: 10.0),
             Text(
               btnText,

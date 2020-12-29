@@ -7,8 +7,6 @@ import '../config/colors.dart';
 import '../widgets/avatar.dart';
 
 class Chat extends StatelessWidget {
-  const Chat();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +24,7 @@ class Chat extends StatelessWidget {
             child: Padding(
               padding:
                   const EdgeInsets.only(top: 8.0, right: 15.0, bottom: 8.0),
-              child: Avatar(),
+              child: Avatar(borderColor: ConstantColors.primaryColor),
             ),
             onTap: () {
               Provider.of<EmailAuthModel>(context, listen: false).signOut();
@@ -36,7 +34,7 @@ class Chat extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          EmptyChatList(),
+          ChatList(),
           Positioned(
             left: 0,
             right: 0,
@@ -66,6 +64,101 @@ class Chat extends StatelessWidget {
                   )),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChatList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Avatar(borderColor: ConstantColors.grayColor),
+                SizedBox(height: 5.0),
+                Container(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.55),
+                  child: Material(
+                    color: ConstantColors.grayColor,
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(20.0),
+                      bottomLeft: Radius.circular(20.0),
+                      bottomRight: Radius.circular(20.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 13.0, horizontal: 13.0),
+                      child: Text(
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In consectetur malesuada.",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.55),
+                  child: Material(
+                    color: ConstantColors.primaryColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                      bottomLeft: Radius.circular(20.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 13.0, horizontal: 13.0),
+                      child: Text(
+                        "amet, consectetur ",
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyText1
+                            .copyWith(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 5.0),
+                Container(
+                  width: 20.0,
+                  height: 20.0,
+                  decoration: BoxDecoration(
+                    color: ConstantColors.primaryColor,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10.0),
+                    ),
+                  ),
+                  child: Icon(
+                    CustomIcons.check_all_big,
+                    color: Colors.white,
+                    size: 8.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: double.infinity, height: 30.0),
         ],
       ),
     );

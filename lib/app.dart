@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kooma/screens/chat.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:your_splash/your_splash.dart';
 
+import 'models/auth/email_auth_model.dart';
 import 'screens/onBoarding.dart';
 import 'screens/signin.dart';
 
@@ -13,7 +15,6 @@ class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  final _auth = FirebaseAuth.instance;
   bool isSeen;
   User loggedInUser;
 
@@ -27,12 +28,16 @@ class _AppState extends State<App> {
     }
   }
 
+  void getCurrentUser() async {
+    loggedInUser = await Provider.of<EmailAuthModel>(context, listen: false)
+        .getCurrentUser();
+  }
+
   @override
   void initState() {
     super.initState();
 
-    loggedInUser = _auth.currentUser;
-
+    getCurrentUser();
     getFirstSeen();
   }
 

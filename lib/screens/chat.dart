@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ import '../widgets/avatar.dart';
 
 final _fireStore = FirebaseFirestore.instance;
 final _auth = FirebaseAuth.instance;
+ScrollController _scrollController = ScrollController();
 User loggedInUser = _auth.currentUser;
 
 class Chat extends StatefulWidget {
@@ -99,21 +102,23 @@ class ChatList extends StatelessWidget {
         final currentUser = loggedInUser.email;
 
         return !snapshot.hasData
-            ? EmptyChatList
+            ? EmptyChatList()
             : Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
                       left: 24.0, top: 10.0, right: 24.0, bottom: 10.0),
                   child: ListView(
+                      controller: _scrollController,
                       children: snapshot.data.docs.reversed
                           .map((DocumentSnapshot document) {
-                    return MessageItem(
-                      message: document.data()["text"],
-                      messageTime: document.data()["time"],
-                      senderEmail: document.data()["sender"]["email"],
-                      isMe: currentUser == document.data()["sender"]["email"],
-                    );
-                  }).toList()),
+                        return MessageItem(
+                          message: document.data()["text"],
+                          messageTime: document.data()["time"],
+                          senderEmail: document.data()["sender"]["email"],
+                          isMe:
+                              currentUser == document.data()["sender"]["email"],
+                        );
+                      }).toList()),
                 ),
               );
       },
@@ -191,10 +196,39 @@ class MessageItem extends StatelessWidget {
   }
 }
 
-//ignore: must_be_immutable
-class MessageField extends StatelessWidget {
+class MessageField extends StatefulWidget {
+  @override
+  _MessageFieldState createState() => _MessageFieldState();
+}
+
+class _MessageFieldState extends State<MessageField> {
   final messageTextController = TextEditingController();
+  bool isEnabled = false;
   String messageText;
+  FocusNode messageFieldFocus;
+  Color sendBtnColor = ConstantColors.grayColor;
+
+  void scrollToBottom() {
+    final bottomOffset = _scrollController.position.maxScrollExtent;
+    _scrollController.animateTo(
+      bottomOffset,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    messageFieldFocus = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    messageFieldFocus.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -206,6 +240,8 @@ class MessageField extends StatelessWidget {
             padding: const EdgeInsets.only(left: 2.0, right: 10.0),
             child: TextField(
               controller: messageTextController,
+              cursorColor: ConstantColors.grayColor,
+              focusNode: messageFieldFocus,
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0),
                 hintText: "Type your message here...",
@@ -223,7 +259,19 @@ class MessageField extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30.0),
                 ),
               ),
+              onTap: () {
+                scrollToBottom();
+                messageFieldFocus.requestFocus();
+              },
               onChanged: (value) {
+                setState(() {
+                  sendBtnColor = ConstantColors.primaryColor;
+                });
+                if (messageTextController.text.trim().isEmpty) {
+                  setState(() {
+                    sendBtnColor = ConstantColors.grayColor;
+                  });
+                }
                 messageText = value;
               },
             ),
@@ -232,23 +280,26 @@ class MessageField extends StatelessWidget {
         GestureDetector(
           child: Icon(
             CustomIcons.happy,
-            color: ConstantColors.primaryColor,
+            color: sendBtnColor,
             size: 40.0,
           ),
           onTap: () {
-            messageTextController.clear();
             /* _fireStore.collection('messages').get().then((snapshot) {
               for (DocumentSnapshot doc in snapshot.docs) {
                 doc.reference.delete();
               }
             });*/
-            _fireStore.collection("messages").add({
-              "text": messageText,
-              "sender": {
-                "email": loggedInUser.email,
-              },
-              "time": DateTime.now(),
-            }).catchError((error) => print("Error: $error"));
+            if (messageTextController.text.trim().isNotEmpty) {
+              scrollToBottom();
+              _fireStore.collection("messages").add({
+                "text": messageText,
+                "sender": {
+                  "email": loggedInUser.email,
+                },
+                "time": DateTime.now(),
+              }).catchError((error) => print("Error: $error"));
+              messageTextController.clear();
+            }
           },
         )
       ],

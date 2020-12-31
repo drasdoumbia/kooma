@@ -37,75 +37,76 @@ class SignIn extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: 50.0),
-            Center(
-              child: Text(
-                "Log into your account \nto start the conversations",
-                style: Theme.of(context).textTheme.headline1,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              SizedBox(height: 50.0),
+              Center(
+                child: Text(
+                  "Log into your account \nto start the conversations",
+                  style: Theme.of(context).textTheme.headline1,
+                ),
               ),
-            ),
-            SizedBox(height: 70.0),
-            CustomFormField(
-              inputType: TextInputType.emailAddress,
-              hint: "Your Email Here",
-              onChange: (value) {
-                email = value;
-              },
-            ),
-            SizedBox(height: 20.0),
-            CustomFormField(
-              inputType: TextInputType.text,
-              obscure: true,
-              hint: "Your Password Here",
-              onChange: (value) {
-                password = value;
-              },
-            ),
-            SizedBox(height: 35.0),
-            PrimaryButton(
-              onPress: () async {
-                try {
-                  var auth =
-                      Provider.of<EmailAuthModel>(context, listen: false);
+              SizedBox(height: 70.0),
+              CustomFormField(
+                inputType: TextInputType.emailAddress,
+                hint: "Your Email Here",
+                onChange: (value) {
+                  email = value;
+                },
+              ),
+              SizedBox(height: 20.0),
+              CustomFormField(
+                inputType: TextInputType.text,
+                obscure: true,
+                hint: "Your Password Here",
+                onChange: (value) {
+                  password = value;
+                },
+              ),
+              SizedBox(height: 35.0),
+              PrimaryButton(
+                onPress: () async {
+                  try {
+                    var auth =
+                        Provider.of<EmailAuthModel>(context, listen: false);
 
-                  var loggedUser = auth.signIn(email, password);
+                    var loggedUser = auth.signIn(email, password);
 
-                  if (loggedUser != null) {
-                    Navigator.pushNamed(context, "chat");
+                    if (loggedUser != null) {
+                      Navigator.pushNamed(context, "chat");
+                    }
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'weak-password') {
+                      print("Error: weak password");
+                    }
+                    if (e.code == 'email-already-in-use') {
+                      print("Error: email already in use");
+                    }
+                  } catch (e) {
+                    print(e);
                   }
-                } on FirebaseAuthException catch (e) {
-                  if (e.code == 'weak-password') {
-                    print("Error: weak password");
-                  }
-                  if (e.code == 'email-already-in-use') {
-                    print("Error: email already in use");
-                  }
-                } catch (e) {
-                  print(e);
-                }
-              },
-              btnText: "Log In",
-            ),
-            SizedBox(height: 35.0),
-            DividerInAuthScreen(),
-            SizedBox(height: 35.0),
-            SocialAuthButton(
-              socialIcon: Image.asset("assets/imgs/google.png", width: 20.0),
-              btnText: "Log In with Google",
-            ),
-            SizedBox(height: 20.0),
-            SocialAuthButton(
-              socialIcon: Image.asset("assets/imgs/facebook.png", width: 20.0),
-              btnText: "Log In with Facebook",
-            ),
-            SizedBox(height: 60.0),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0),
-              child: GestureDetector(
+                },
+                btnText: "Log In",
+              ),
+              SizedBox(height: 35.0),
+              DividerInAuthScreen(),
+              SizedBox(height: 35.0),
+              SocialAuthButton(
+                socialIcon: Image.asset("assets/imgs/google.png", width: 20.0),
+                btnText: "Log In with Google",
+              ),
+              SizedBox(height: 20.0),
+              SocialAuthButton(
+                socialIcon:
+                    Image.asset("assets/imgs/facebook.png", width: 20.0),
+                btnText: "Log In with Facebook",
+              ),
+              SizedBox(height: 60.0),
+              GestureDetector(
                 child: Row(
                   children: [
                     Text(
@@ -116,7 +117,7 @@ class SignIn extends StatelessWidget {
                     ),
                     SizedBox(width: 10.0),
                     Text(
-                      "Sign Up here",
+                      "Sign Up",
                       style: TextStyle(
                         color: ConstantColors.grayColor,
                         fontSize: 16.0,
@@ -130,8 +131,8 @@ class SignIn extends StatelessWidget {
                   Navigator.pushNamed(context, "signup");
                 },
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class Avatar extends StatelessWidget {
   final Color borderColor;
+  final String avatarImg;
 
-  const Avatar({this.borderColor});
+  const Avatar({this.borderColor, this.avatarImg});
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +18,10 @@ class Avatar extends StatelessWidget {
         border: Border.all(
             color: borderColor, width: 1.0, style: BorderStyle.solid),
       ),
-      child: Image.asset(
-        "assets/imgs/avatar.png",
-        fit: BoxFit.cover,
+      child: CircleAvatar(
+        backgroundImage: NetworkImage(
+          avatarImg,
+        ),
       ),
     );
   }

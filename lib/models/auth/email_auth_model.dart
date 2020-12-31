@@ -13,56 +13,62 @@ class EmailAuthModel extends ChangeNotifier
 
   @override
   Future<UserCredential> register(email, password) async {
-    var newUser;
-
     try {
-      newUser = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password);
+      await _auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((newUser) async {
+        await newUser.user.updateProfile(
+          displayName: "Full Name",
+          photoURL:
+              "https://firebasestorage.googleapis.com/v0/b/kooma-982b9.appspot.com/o/profile_pics%2Fdefault_avatar.png?alt=media&token=8657ac55-7a46-4aea-b1a7-d4db017e49fa",
+        );
+        newUser.user.reload();
+      }).catchError((e) => print(e));
 
-      loggedInUser = _auth.currentUser;
+/*      loggedInUser = _auth.currentUser;
       await _fireStore.collection("users").add({
         "id": loggedInUser.uid,
         "email": loggedInUser.email,
         "fullName": "Your Full Name",
         "phoneNumber": 12345678,
         "profileUrl": "assets/imgs/default_avatar.png"
-      }).catchError((error) => print("Failed to add user: $error"));
+      }).catchError((error) => print("Failed to add user: $error"));*/
 
       notifyListeners();
     } catch (e) {
       print(e);
     }
-
-    return newUser;
   }
 
   @override
   Future<UserCredential> signIn(email, password) async {
-    var loggedUser;
+    var signedInUser;
 
     try {
-      loggedUser = await _auth.signInWithEmailAndPassword(
+      signedInUser = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
 
-      print(loggedUser);
+      print(signedInUser);
       notifyListeners();
     } catch (e) {
       print(e);
     }
 
-    return loggedUser;
+    return signedInUser;
   }
 
   @override
   Future<User> getCurrentUser() async {
     try {
-      loggedInUser = _auth.currentUser;
+      loggedInUser = await Future.value(_auth.currentUser);
       /*    print("from model: $loggedInUser");*/
 
       notifyListeners();
     } catch (e) {
       print(e);
     }
+
+    print(loggedInUser);
 
     return loggedInUser;
   }
@@ -72,5 +78,28 @@ class EmailAuthModel extends ChangeNotifier
     await _auth.signOut();
 
     notifyListeners();
+  }
+
+  @override
+  Future<void> updateUser(fullName, phoneNumber, email, photoUrl) async {
+    var currentUser = await getCurrentUser();
+
+    try {
+      await currentUser
+          .updateProfile(displayName: fullName, photoURL: photoUrl)
+          .catchError((error) => print("Error: $error"));
+      await currentUser
+          .updateEmail(email)
+          .catchError((error) => print("Error: $error"));
+      await currentUser
+          .updatePhoneNumber(phoneNumber as PhoneAuthCredential)
+          .catchError((error) => print("Error: $error"));
+
+      await currentUser.reload();
+
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
   }
 }

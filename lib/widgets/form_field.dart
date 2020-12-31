@@ -5,16 +5,21 @@ class CustomFormField extends StatelessWidget {
   final String hint;
   final bool obscure;
   final dynamic inputType;
+  final TextEditingController fieldController;
   final Function onChange;
 
   const CustomFormField(
-      {this.hint, this.obscure = false, this.inputType, this.onChange});
+      {this.hint,
+      this.obscure = false,
+      this.inputType,
+      this.fieldController,
+      this.onChange});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 318.0,
       child: TextField(
+        controller: fieldController,
         obscureText: obscure,
         keyboardType: inputType,
         cursorColor: ConstantColors.grayColor,

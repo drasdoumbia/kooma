@@ -49,7 +49,9 @@ class _ChatState extends State<Chat> {
             child: Padding(
               padding:
                   const EdgeInsets.only(top: 8.0, right: 15.0, bottom: 8.0),
-              child: Avatar(borderColor: ConstantColors.primaryColor),
+              child: Avatar(
+                  borderColor: ConstantColors.primaryColor,
+                  avatarImg: loggedInUser.photoURL),
             ),
             onTap: () {
               Navigator.pushNamed(context, "profile");
@@ -101,8 +103,8 @@ class ChatList extends StatelessWidget {
 
         final currentUser = loggedInUser.email;
 
-        return !snapshot.hasData
-            ? EmptyChatList()
+        return snapshot.data.docs.length == 0
+            ? Expanded(child: EmptyChatList())
             : Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
@@ -115,6 +117,8 @@ class ChatList extends StatelessWidget {
                           message: document.data()["text"],
                           messageTime: document.data()["time"],
                           senderEmail: document.data()["sender"]["email"],
+                          senderAvatar: document.data()["sender"]
+                              ["profileImage"],
                           isMe:
                               currentUser == document.data()["sender"]["email"],
                         );
@@ -131,9 +135,14 @@ class MessageItem extends StatelessWidget {
   final messageTime;
   final isMe;
   final senderEmail;
+  final senderAvatar;
 
   const MessageItem(
-      {this.message, this.messageTime, this.isMe, this.senderEmail});
+      {this.message,
+      this.messageTime,
+      this.isMe,
+      this.senderEmail,
+      this.senderAvatar});
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +150,10 @@ class MessageItem extends StatelessWidget {
       crossAxisAlignment:
           isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
       children: [
-        isMe ? Container() : Avatar(borderColor: ConstantColors.grayColor),
+        isMe
+            ? Container()
+            : Avatar(
+                borderColor: ConstantColors.grayColor, avatarImg: senderAvatar),
         SizedBox(height: 5.0),
         Container(
           constraints: BoxConstraints(
@@ -284,17 +296,20 @@ class _MessageFieldState extends State<MessageField> {
             size: 40.0,
           ),
           onTap: () {
-            /* _fireStore.collection('messages').get().then((snapshot) {
+            /*_fireStore.collection('messages').get().then((snapshot) {
               for (DocumentSnapshot doc in snapshot.docs) {
                 doc.reference.delete();
               }
             });*/
             if (messageTextController.text.trim().isNotEmpty) {
-              scrollToBottom();
+              if (_scrollController.hasClients) {
+                scrollToBottom();
+              }
               _fireStore.collection("messages").add({
                 "text": messageText,
                 "sender": {
                   "email": loggedInUser.email,
+                  "profileImage": loggedInUser.photoURL,
                 },
                 "time": DateTime.now(),
               }).catchError((error) => print("Error: $error"));
@@ -314,23 +329,26 @@ class EmptyChatList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Image.asset("assets/imgs/empty_chat_img.png", width: 215.0),
-        SizedBox(width: double.infinity, height: 80.0),
-        Text(
-          "Say hello to friends 👥",
-          style: Theme.of(context).textTheme.headline1,
-          textAlign: TextAlign.center,
-        ),
-        SizedBox(height: 25.0),
-        Text(
-          "Start engaging with wanderful people today \nand enjoy life!",
-          style: Theme.of(context).textTheme.bodyText1,
-          textAlign: TextAlign.center,
-        ),
-      ],
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(height: 30.0),
+          Image.asset("assets/imgs/empty_chat_img.png", width: 215.0),
+          SizedBox(width: double.infinity, height: 80.0),
+          Text(
+            "Say hello to friends 👥",
+            style: Theme.of(context).textTheme.headline1,
+            textAlign: TextAlign.center,
+          ),
+          SizedBox(height: 25.0),
+          Text(
+            "Start engaging with wanderful people today \nand enjoy life!",
+            style: Theme.of(context).textTheme.bodyText1,
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

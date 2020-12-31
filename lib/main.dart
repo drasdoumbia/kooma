@@ -21,6 +21,7 @@ class Kooma extends StatelessWidget {
       child: Consumer<EmailAuthModel>(
         builder: (context, provider, child) {
           return MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'Kooma',
             initialRoute: '/',
             onGenerateRoute: Routes.generateRoute,

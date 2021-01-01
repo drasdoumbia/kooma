@@ -25,34 +25,38 @@ class OnBoarding extends StatelessWidget {
                 TextStyle(fontSize: 16.0, color: ConstantColors.grayDarkColor)),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(CustomIcons.logo,
-                color: ConstantColors.secondaryColor, size: 70.0),
-            SizedBox(height: 60.0),
-            Image.asset("assets/imgs/onBoarding_illustration.png"),
-            SizedBox(height: 40.0),
-            Center(
-              child: Text("Welcome!",
-                  style: Theme.of(context).textTheme.headline1),
-            ),
-            SizedBox(height: 10.0),
-            Center(
-              child: Text(
-                  "Join people you love and interact with \n them in a very friendly way.",
-                  style: Theme.of(context).textTheme.bodyText1),
-            ),
-            SizedBox(height: 80.0),
-            PrimaryButton(
-              color: ConstantColors.secondaryColor,
-              btnText: "Sign me up",
-              onPress: () {
-                firstSeen();
-                Navigator.pushNamed(context, 'signup');
-              },
-            ),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Icon(CustomIcons.logo,
+                  color: ConstantColors.secondaryColor, size: 70.0),
+              SizedBox(height: 60.0),
+              Image.asset("assets/imgs/onBoarding_illustration.png"),
+              SizedBox(height: 40.0),
+              Center(
+                child: Text("Welcome!",
+                    style: Theme.of(context).textTheme.headline1),
+              ),
+              SizedBox(height: 10.0),
+              Center(
+                child: Text(
+                    "Join people you love and interact with \n them in a very friendly way.",
+                    style: Theme.of(context).textTheme.bodyText1),
+              ),
+              SizedBox(height: 80.0),
+              PrimaryButton(
+                color: ConstantColors.secondaryColor,
+                btnText: "Sign me up",
+                onPress: () {
+                  firstSeen();
+                  Navigator.pushNamed(context, 'signup');
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

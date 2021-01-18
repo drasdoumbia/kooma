@@ -1,4 +1,4 @@
-# kooma
+# kooma - 🚧 work in progress 🚧
 
 Kooma is a message application allowing you to engage with people in your circle.
 

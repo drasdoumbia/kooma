@@ -21,7 +21,9 @@ class Routes {
       case 'profile':
         return MaterialPageRoute(builder: (context) => Profile());
       case 'editProfile':
-        return MaterialPageRoute(builder: (context) => EditProfile());
+        var data = settings.arguments;
+
+        return MaterialPageRoute(builder: (context) => EditProfile(user: data));
       default:
         return MaterialPageRoute(builder: (context) => Home());
     }

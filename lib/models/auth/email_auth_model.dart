@@ -8,36 +8,35 @@ class EmailAuthModel extends ChangeNotifier
   final _auth = FirebaseAuth.instance;
   final _fireStore = FirebaseFirestore.instance;
   var loggedInUser;
+  DocumentSnapshot userData;
 
   EmailAuthModel();
 
   @override
   Future<UserCredential> register(email, password) async {
+    var user;
+
     try {
-      await _auth
+      user = await _auth
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((newUser) async {
-        await newUser.user.updateProfile(
-          displayName: "Full Name",
-          photoURL:
-              "https://firebasestorage.googleapis.com/v0/b/kooma-982b9.appspot.com/o/profile_pics%2Fdefault_avatar.png?alt=media&token=8657ac55-7a46-4aea-b1a7-d4db017e49fa",
-        );
-        newUser.user.reload();
+        await _fireStore.collection("users").doc(newUser.user.uid).set({
+          "email": newUser.user.email,
+          "fullName": "Your Full Name",
+          "phoneNumber": "12345678",
+          "profileUrl":
+              "https://firebasestorage.googleapis.com/v0/b/kooma-982b9.appspot.com/o/profile_pics%2Fdefault_avatar.png?alt=media&token=8657ac55-7a46-4aea-b1a7-d4db017e49fa"
+        }).catchError((error) => print("Failed to add user: $error"));
       }).catchError((e) => print(e));
 
-/*      loggedInUser = _auth.currentUser;
-      await _fireStore.collection("users").add({
-        "id": loggedInUser.uid,
-        "email": loggedInUser.email,
-        "fullName": "Your Full Name",
-        "phoneNumber": 12345678,
-        "profileUrl": "assets/imgs/default_avatar.png"
-      }).catchError((error) => print("Failed to add user: $error"));*/
+      print(user);
 
       notifyListeners();
     } catch (e) {
       print(e);
     }
+
+    return user;
   }
 
   @override
@@ -61,14 +60,11 @@ class EmailAuthModel extends ChangeNotifier
   Future<User> getCurrentUser() async {
     try {
       loggedInUser = await Future.value(_auth.currentUser);
-      /*    print("from model: $loggedInUser");*/
 
       notifyListeners();
     } catch (e) {
       print(e);
     }
-
-    print(loggedInUser);
 
     return loggedInUser;
   }
@@ -81,25 +77,44 @@ class EmailAuthModel extends ChangeNotifier
   }
 
   @override
-  Future<void> updateUser(fullName, phoneNumber, email, photoUrl) async {
+  Future<void> updateUser(fullName, phoneNumber, email, profileUrl) async {
     var currentUser = await getCurrentUser();
 
     try {
-      await currentUser
-          .updateProfile(displayName: fullName, photoURL: photoUrl)
-          .catchError((error) => print("Error: $error"));
-      await currentUser
-          .updateEmail(email)
-          .catchError((error) => print("Error: $error"));
-      await currentUser
-          .updatePhoneNumber(phoneNumber as PhoneAuthCredential)
-          .catchError((error) => print("Error: $error"));
-
-      await currentUser.reload();
+      _fireStore.collection("users").doc(currentUser.uid).update({
+        "fullName": fullName,
+        "phoneNumber": phoneNumber,
+        "email": email,
+        "profileUrl": profileUrl
+      }).catchError((error) => print(error));
 
       notifyListeners();
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<DocumentSnapshot> getUserInfo() async {
+    try {
+      String userId = _auth.currentUser.uid;
+      print("userId: $userId");
+      await _fireStore.collection("users").doc(userId).get().then(
+        (DocumentSnapshot documentSnapshot) {
+          if (documentSnapshot.exists) {
+            userData = documentSnapshot;
+            print('Document data: ${documentSnapshot.data()["profileUrl"]}');
+          } else {
+            print('Document does not exist on the database');
+          }
+        },
+      );
+      notifyListeners();
+    } catch (e) {
+      print(e);
+    }
+
+    print("userData from model: ${userData.data()}");
+
+    return userData;
   }
 }

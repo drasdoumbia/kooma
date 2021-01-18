@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kooma/config/colors.dart';
-import 'package:kooma/config/custom_icons.dart';
 
 class RoundedIconButton extends StatelessWidget {
   final Function onPress;

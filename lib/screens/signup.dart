@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kooma/config/colors.dart';
 import 'package:kooma/config/custom_icons.dart';
+import 'package:kooma/providers/auth_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../models/auth/email_auth_model.dart';
@@ -71,9 +72,10 @@ class SignUp extends StatelessWidget {
                 onPress: () async {
                   try {
                     var auth =
-                        Provider.of<EmailAuthModel>(context, listen: false);
+                        Provider.of<AuthProvider>(context, listen: false);
 
-                    var newUser = auth.register(email, password);
+                    var newUser =
+                        auth.registerWithEmailAndPassword(email, password);
 
                     if (newUser != null) {
                       Navigator.pushNamed(context, "chat");

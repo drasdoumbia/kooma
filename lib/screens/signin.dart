@@ -4,6 +4,7 @@ import 'package:kooma/config/colors.dart';
 import 'package:kooma/config/custom_icons.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/auth_provider.dart';
 import '../widgets/divider_in_auth_screen.dart';
 import '../widgets/buttons/primary_button.dart';
 import '../widgets/buttons/social_auth_button.dart';
@@ -72,11 +73,12 @@ class SignIn extends StatelessWidget {
                 onPress: () async {
                   try {
                     var auth =
-                        Provider.of<EmailAuthModel>(context, listen: false);
+                        Provider.of<AuthProvider>(context, listen: false);
 
-                    var loggedUser = auth.signIn(email, password);
+                    bool status =
+                        await auth.signInWithEmailAndPassword(email, password);
 
-                    if (loggedUser != null) {
+                    if (status) {
                       Navigator.pushNamed(context, "chat");
                     }
                   } on FirebaseAuthException catch (e) {

@@ -1,10 +1,12 @@
-import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kooma/config/custom_icons.dart';
 import 'package:kooma/models/auth/email_auth_model.dart';
+import 'package:kooma/models/message_model.dart';
+import 'package:kooma/models/user_model.dart';
+import 'package:kooma/providers/auth_provider.dart';
+import 'package:kooma/services/firebase_database.dart';
 import 'package:provider/provider.dart';
 
 import '../config/colors.dart';
@@ -15,25 +17,12 @@ final _auth = FirebaseAuth.instance;
 ScrollController _scrollController = ScrollController();
 User loggedInUser = _auth.currentUser;
 
-class Chat extends StatefulWidget {
-  @override
-  _ChatState createState() => _ChatState();
-}
-
-class _ChatState extends State<Chat> {
-/*  void getCurrentUser() async {
-    loggedInUser = await Provider.of<EmailAuthModel>(context).getCurrentUser();
-  }*/
-
-  @override
-  void initState() {
-    super.initState();
-
-    // getCurrentUser();
-  }
-
+class Chat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final firebaseDatabase =
+        Provider.of<FirebaseDatabase>(context, listen: false);
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -45,17 +34,28 @@ class _ChatState extends State<Chat> {
           style: TextStyle(fontSize: 16.0, color: ConstantColors.grayDarkColor),
         ),
         actions: [
-          GestureDetector(
-            child: Padding(
-              padding:
-                  const EdgeInsets.only(top: 8.0, right: 15.0, bottom: 8.0),
-              child: Avatar(
-                  borderColor: ConstantColors.primaryColor,
-                  avatarImg: loggedInUser.photoURL),
-            ),
-            onTap: () {
-              Navigator.pushNamed(context, "profile");
-              // Provider.of<EmailAuthModel>(context, listen: false).signOut();
+          StreamBuilder(
+            stream: firebaseDatabase.userStream(loggedInUser.uid),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final UserModel user = snapshot.data;
+                return GestureDetector(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                        top: 8.0, right: 15.0, bottom: 8.0),
+                    child: Avatar(
+                        borderColor: ConstantColors.primaryColor,
+                        avatarImg: user.photoUrl),
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, "profile");
+                    // Provider.of<EmailAuthModel>(context, listen: false).signOut();
+                    // Navigator.pushNamed(context, "signin");
+                  },
+                );
+              } else {
+                return Container();
+              }
             },
           ),
         ],
@@ -84,47 +84,63 @@ class _ChatState extends State<Chat> {
   }
 }
 
-class ChatList extends StatelessWidget {
+class ChatList extends StatefulWidget {
+  @override
+  _ChatListState createState() => _ChatListState();
+}
+
+class _ChatListState extends State<ChatList> {
+  User loggedInUser = _auth.currentUser;
+  var userData;
+
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _fireStore
-          .collection("messages")
-          .orderBy('time', descending: true)
-          .snapshots(),
-      builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
-          print("No data");
+    final firebaseDatabase =
+        Provider.of<FirebaseDatabase>(context, listen: false);
+
+    return StreamBuilder(
+      stream: firebaseDatabase.messageStream(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final currentUser = loggedInUser.email;
+          List<MessageModel> messages = snapshot.data;
+          if (messages.isNotEmpty) {
+            Map<String, dynamic> userData;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                    left: 24.0, top: 10.0, right: 24.0, bottom: 10.0),
+                child: ListView(
+                  controller: _scrollController,
+                  children: messages.map((message) {
+                    return MessageItem(
+                      message: message.text,
+                      messageTime: message.time,
+                      senderEmail: message.senderEmail,
+                      // senderAvatar:
+                      // userData == null ? "" : userData["profileUrl"],
+                      isMe: currentUser == message.senderEmail,
+                    );
+                  }).toList(),
+                ),
+              ),
+            );
+          }
         }
 
         if (snapshot.hasError) {
           print("Something went wrong");
         }
 
-        final currentUser = loggedInUser.email;
+        if (snapshot.data == null) {
+          return Expanded(child: EmptyChatList());
+        }
 
-        return snapshot.data.docs.length == 0
-            ? Expanded(child: EmptyChatList())
-            : Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 24.0, top: 10.0, right: 24.0, bottom: 10.0),
-                  child: ListView(
-                      controller: _scrollController,
-                      children: snapshot.data.docs.reversed
-                          .map((DocumentSnapshot document) {
-                        return MessageItem(
-                          message: document.data()["text"],
-                          messageTime: document.data()["time"],
-                          senderEmail: document.data()["sender"]["email"],
-                          senderAvatar: document.data()["sender"]
-                              ["profileImage"],
-                          isMe:
-                              currentUser == document.data()["sender"]["email"],
-                        );
-                      }).toList()),
-                ),
-              );
+        return Material(
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
       },
     );
   }
@@ -153,7 +169,8 @@ class MessageItem extends StatelessWidget {
         isMe
             ? Container()
             : Avatar(
-                borderColor: ConstantColors.grayColor, avatarImg: senderAvatar),
+                borderColor: ConstantColors.grayColor,
+                avatarImg: senderAvatar == null ? "" : senderAvatar),
         SizedBox(height: 5.0),
         Container(
           constraints: BoxConstraints(
@@ -219,6 +236,7 @@ class _MessageFieldState extends State<MessageField> {
   String messageText;
   FocusNode messageFieldFocus;
   Color sendBtnColor = ConstantColors.grayColor;
+  User loggedInUser = _auth.currentUser;
 
   void scrollToBottom() {
     final bottomOffset = _scrollController.position.maxScrollExtent;
@@ -244,6 +262,9 @@ class _MessageFieldState extends State<MessageField> {
 
   @override
   Widget build(BuildContext context) {
+    final firebaseDatabase =
+        Provider.of<FirebaseDatabase>(context, listen: false);
+
     return Row(
       children: [
         Icon(CustomIcons.chevron_big_right, color: ConstantColors.primaryColor),
@@ -272,7 +293,9 @@ class _MessageFieldState extends State<MessageField> {
                 ),
               ),
               onTap: () {
-                scrollToBottom();
+                if (_scrollController.hasClients) {
+                  scrollToBottom();
+                }
                 messageFieldFocus.requestFocus();
               },
               onChanged: (value) {
@@ -305,14 +328,16 @@ class _MessageFieldState extends State<MessageField> {
               if (_scrollController.hasClients) {
                 scrollToBottom();
               }
-              _fireStore.collection("messages").add({
-                "text": messageText,
-                "sender": {
-                  "email": loggedInUser.email,
-                  "profileImage": loggedInUser.photoURL,
-                },
-                "time": DateTime.now(),
-              }).catchError((error) => print("Error: $error"));
+
+              MessageModel message = MessageModel(
+                  text: messageText,
+                  senderEmail: loggedInUser.email,
+                  sender: _fireStore.doc("/users/${loggedInUser.uid}"),
+                  time: DateTime.now());
+
+              firebaseDatabase
+                  .createMessage(message)
+                  .catchError((error) => print("Error: $error"));
               messageTextController.clear();
             }
           },

@@ -2,10 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:kooma/config/custom_icons.dart';
-import 'package:kooma/models/auth/email_auth_model.dart';
 import 'package:kooma/models/message_model.dart';
 import 'package:kooma/models/user_model.dart';
-import 'package:kooma/providers/auth_provider.dart';
 import 'package:kooma/services/firebase_database.dart';
 import 'package:provider/provider.dart';
 
@@ -92,6 +90,7 @@ class ChatList extends StatefulWidget {
 class _ChatListState extends State<ChatList> {
   User loggedInUser = _auth.currentUser;
   var userData;
+  String url;
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +112,10 @@ class _ChatListState extends State<ChatList> {
                 child: ListView(
                   controller: _scrollController,
                   children: messages.map((message) {
+                    message.sender
+                        .get()
+                        .then((value) => print(value.data()["photoUrl"]));
+
                     return MessageItem(
                       message: message.text,
                       messageTime: message.time,

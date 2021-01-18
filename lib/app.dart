@@ -51,11 +51,33 @@ class _AppState extends State<App> {
       builder: (BuildContext context, AsyncSnapshot<UserModel> userSnapshot) {
         return Consumer<AuthProvider>(builder: (_, authProviderRef, __) {
           if (userSnapshot.connectionState == ConnectionState.active) {
-            return (isSeen && loggedInUser != null)
-                ? Chat()
-                : (isSeen && loggedInUser == null)
-                    ? SignIn()
-                    : OnBoarding();
+            return SplashScreen.timed(
+              seconds: 4,
+              route: MaterialPageRoute(
+                builder: (_) => (isSeen && loggedInUser != null)
+                    ? Chat()
+                    : (isSeen && loggedInUser == null)
+                        ? SignIn()
+                        : OnBoarding(),
+              ),
+              body: Scaffold(
+                body: Container(
+                  color: Color(0xFFFAD271),
+                  child: Center(
+                    child: Container(
+                      width: 200.0,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          alignment: Alignment.center,
+                          image: const AssetImage(
+                              "assets/imgs/splash_screen_content.png"),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
           }
           return Material(
             child: CircularProgressIndicator(),
@@ -65,31 +87,3 @@ class _AppState extends State<App> {
     );
   }
 }
-
-/*SplashScreen.timed(
-seconds: 4,
-route: MaterialPageRoute(
-builder: (_) => (isSeen && loggedInUser != null)
-? Chat()
-    : (isSeen && loggedInUser == null)
-? SignIn()
-    : OnBoarding(),
-),
-body: Scaffold(
-body: Container(
-color: Color(0xFFFAD271),
-child: Center(
-child: Container(
-width: 200.0,
-decoration: const BoxDecoration(
-image: DecorationImage(
-alignment: Alignment.center,
-image: const AssetImage(
-"assets/imgs/splash_screen_content.png"),
-),
-),
-),
-),
-),
-),
-)*/
